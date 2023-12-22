@@ -41,6 +41,16 @@ async function run() {
             const result = await WorkDB.find(query).toArray()
             res.send(result);
         })
+        app.get('/ongoing', async (req, res) => {
+            const query = { position: 'ongoing' }
+            const result = await WorkDB.find(query).toArray()
+            res.send(result);
+        })
+        app.get('/completed', async (req, res) => {
+            const query = { position: 'completed' }
+            const result = await WorkDB.find(query).toArray()
+            res.send(result);
+        })
         app.patch('/work/:id', async (req, res) => {
             const id = req.params.id
             const query = { _id: new ObjectId(id) }
