@@ -36,8 +36,35 @@ async function run() {
             const result = await WorkDB.find().toArray()
             res.send(result);
         })
-        app.get('/allWork', async (req, res) => {
-            const result = await WorkDB.find().toArray()
+        app.get('/todo', async (req, res) => {
+            const query = { position: 'to do' }
+            const result = await WorkDB.find(query).toArray()
+            res.send(result);
+        })
+        app.patch('/work/:id', async (req, res) => {
+            const id = req.params.id
+            const query = { _id: new ObjectId(id) }
+
+            const updateDoc = {
+                $set: {
+                    position: 'ongoing'
+                }
+
+            };
+            const result = await WorkDB.updateOne(query, updateDoc);
+            res.send(result);
+        })
+        app.patch('/work/com/:id', async (req, res) => {
+            const id = req.params.id
+            const query = { _id: new ObjectId(id) }
+
+            const updateDoc = {
+                $set: {
+                    position: 'completed'
+                }
+
+            };
+            const result = await WorkDB.updateOne(query, updateDoc);
             res.send(result);
         })
 
