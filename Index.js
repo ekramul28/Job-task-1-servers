@@ -23,7 +23,7 @@ const client = new MongoClient(uri, {
 async function run() {
     try {
         // Connect the client to the server	(optional starting in v4.7)
-        await client.connect();
+        // await client.connect();
         const WorkDB = client.db("manageWork").collection("work");
 
         app.post("/work", async (req, res) => {
@@ -34,6 +34,12 @@ async function run() {
         })
         app.get('/allWork', async (req, res) => {
             const result = await WorkDB.find().toArray()
+            res.send(result);
+        })
+        app.get('/allWork/:id', async (req, res) => {
+            const id = req.params.id
+            const query = { _id: new ObjectId(id) }
+            const result = await WorkDB.findOne(query)
             res.send(result);
         })
         app.get('/todo', async (req, res) => {
@@ -53,35 +59,46 @@ async function run() {
         })
         app.patch('/work/:id', async (req, res) => {
             const id = req.params.id
-            console.log(id)
+            const { name } = req.body;
             const query = { _id: new ObjectId(id) }
             const updateDoc = {
                 $set: {
-                    position: 'ongoing'
+                    position: name
                 }
 
             };
             const result = await WorkDB.updateOne(query, updateDoc);
+            console.log(result);
             res.send(result);
         })
-        app.patch('/work/com/:id', async (req, res) => {
+        app.patch('/edit/:id', async (req, res) => {
             const id = req.params.id
+            const data = req.body;
             const query = { _id: new ObjectId(id) }
-
+            console.log(data)
             const updateDoc = {
                 $set: {
-                    position: 'completed'
+                    titles: data.titles,
+                    descriptions: data.descriptions,
+                    deadlines: data.deadlines,
+                    priority: data.priority
                 }
 
             };
             const result = await WorkDB.updateOne(query, updateDoc);
+            console.log(result);
             res.send(result);
         })
 
-
+        app.delete('/delete/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) }
+            const result = await WorkDB.deleteOne(query);
+            res.send(result)
+        })
         // Send a ping to confirm a successful connection
-        await client.db("admin").command({ ping: 1 });
-        console.log("Pinged your deployment. You successfully connected to MongoDB!");
+        // await client.db("admin").command({ ping: 1 });
+        // console.log("Pinged your deployment. You successfully connected to MongoDB!");
     } finally {
         // Ensures that the client will close when you finish/error
         // await client.close();
